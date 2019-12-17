@@ -1,22 +1,49 @@
 <script>
   import ContactCard from "./ContactCard.svelte";
 
-  let name = "Max";
+  let name = "Vladimir";
   let title = "";
   let image = "";
 	let description = "";
-	let checkStatus = false;
+  let checkStatus = false;
+  let contactCards = [];
 	
 	function addCard() {
-		if(name.trim() == "" || title.trim() == "" || description.trim() == "" || image.trim() == "") {
+    if(name.trim() == "" ||
+      title.trim() == "" ||
+      description.trim() == "" || 
+      image.trim() == "") {
 			checkStatus = "!checked";
 			return;
 		} else {
-			checkStatus = 'checked';
-		}
+      checkStatus = 'checked';
+      contactCards = [
+        ...contactCards,
+        {
+          id: Math.random(),
+          name: name,
+          title: title,
+          image: image,
+          desc: description
+        }
+      ];
+    }
+    
+    console.log(contactCards);
 		
-	}
+  }
 
+  function deleteFirstElement() {
+    contactCards = contactCards.filter((element, index) => index !== 0);
+  }
+
+  function deleteLastElement() {
+    contactCards = contactCards.filter((element, index) => index !== contactCards.length - 1);
+    console.log(contactCards.length - 1);
+  }
+
+  $: name = name;
+  
 </script>
 
 <style>
@@ -44,12 +71,25 @@
     <textarea rows="3" bind:value={description} id="desc" />
   </div>
 </div>
-{#if checkStatus == 'checked'}
-	<ContactCard userName={name} jobTitle={title} {description} userImage={image} />
+{#if checkStatus == '!checked'}
+  <p>You don't fill all fields</p>
 {:else if checkStatus == '!checked'}
   <p>You don't fill all fields</p>
-{:else}
-	<p>Plese fill the fields.</p>
 {/if}
 <button on:click={addCard}>Add a card.</button>
+<button on:click={deleteFirstElement}>Delete first element.</button>
+<button on:click={deleteLastElement}>Delete last element.</button>
+
+{#each contactCards as contact, index (contact.id)}
+<h4># {index + 1}</h4>
+  <ContactCard
+  userName={contact.name}
+  jobTitle={contact.title}
+  userImage={contact.image}
+  description={contact.desc}/>
+{:else}
+  <h5>Plese start adding the card.</h5>
+{/each}
+
+
 
